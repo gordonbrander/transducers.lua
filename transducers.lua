@@ -5,18 +5,6 @@
 -- Create a table to store our exported values.
 local exports = {}
 
-function next_indexed_value(t, i)
-  return t[i + 1]
-end
-
--- Table iterator for values at numbered index. Example:
---
---     for v in values(t) do print(v) end
-local function values(t)
-  return next_indexed_value, t, 0
-end
-exports.values = values
-
 -- Given a value, returns value plus "reduced" function which is used 
 -- as a unique message identity. Used by `reduce_iterator` to allow for
 -- early termination of reduction.
@@ -33,14 +21,15 @@ exports.reduced = reduced
 --
 -- Used by our more generic `reduce` function to handle iterator use cases.
 local function reduce_iterator(step, seed, iter, state, at)
-  -- Note that we reduce with `a` and `b` which is not orthodox, but does make
-  -- this function useful for iterators like `ipairs` and `pairs`. If you want
-  -- a traditional `reduce` signature, where the input value is at position
-  -- `a`, use `values(t)`.
   local result, msg = seed, nil
-  for a, b in iter, state, at do
+  for i, v in iter, state, at do
+    -- We pass `step` the previous result and the value returned by iterator.
+    -- Note that we use an `i, v` return signiture. This matches the return
+    -- value of `ipairs` and `pairs`. However, if `v` is nil, we will pass
+    -- `i` as the value instead. This handles iterators that return a single
+    -- value per turn.
     -- Allow `step` to return a result and an optional message.
-    result, msg = step(result, a, b)
+    result, msg = step(result, v or i)
     -- If step returned a `msg`, then return early. This is useful for reporting
     -- errors during reduction or halting reduction early.
     if msg then return result, msg end
@@ -60,22 +49,22 @@ end
 --     local x = reduce(sum, 0, {1, 2, 3})
 --
 local function reduce(step, seed, iter, state, at)
-  local type_of_x = type(x)
-  if type_of_x == "function" then
+  local type_of_iter = type(iter)
+  if type_of_iter == "function" then
     -- If `iter` is a function, we treat it as an iterator function.
     -- If it ain't an iterator, you'll probably get an error. Be smart.
     return reduce_iterator(step, seed, iter, state, at)
-  elseif type_of_x == "table" then
-    -- If `x` is a table, we'll provide a convenience syntax that passes the
+  elseif type_of_iter == "table" then
+    -- If `iter` is a table, we'll provide a convenience syntax that passes the
     -- table through `ivalues` and then to `reduce_iterator`.
-    return reduce_iterator(step, seed, values(x))
-  elseif x == nil then
+    return reduce_iterator(step, seed, ipairs(iter))
+  elseif iter == nil then
     -- Nil values get no step at all. Return seed as "reduced" value.
     return reduced(seed)
   else
     -- Other non-iterator, non-table, non-nil values are treated as an iterator
     -- yielding a single item -- themselves. We reduce them one step.
-    return reduced(step(seed, x))
+    return reduced(step(seed, iter))
   end
 end
 exports.reduce = reduce
@@ -133,7 +122,7 @@ local function comp(...)
   return function(v)
     -- Loop through all functions and transform value with each function
     -- successively. Feed transformed value to next function in line.
-    return reduce_iterator(apply_to, v, values(fns))
+    return reduce(apply_to, v, fns)
   end
 end
 exports.comp = comp
@@ -249,8 +238,8 @@ local function take_while(predicate)
 end
 exports.take_while = take_while
 
-local function yield_reduction_inputs(_, a, b)
-  coroutine.yield(a, b)
+local function yield_indexed_reduction(i, v)
+  coroutine.yield(i + 1, v)
 end
 
 -- Transform an iterator using a transformation function so that each value
@@ -259,14 +248,14 @@ end
 --
 -- Example:
 --
---     off_by_one = lazily(map(add_one), {1, 2, 3})
---     for x in off_by_one do print(x) end
---     > 2
---     > 3
---     > 4
+--     ups = lazily(map(string.upper), {"a", "b", "c"})
+--     for i, x in ups do print(i, x) end
+--     > 1 "A"
+--     > 2 "B"
+--     > 3 "C"
 local function lazily(xform, iter, state, at)
   return coroutine.wrap(function ()
-    transduce(xform, yield_reduction_inputs, nil, iter, state, at)
+    transduce(xform, yield_indexed_reduction, 0, iter, state, at)
   end)
 end
 exports.lazily = lazily
