@@ -120,7 +120,7 @@ local function collect(iter, state, at)
 end
 exports.collect = collect
 
-function apply_to(v, f)
+local function apply_to(v, f)
   return f(v)
 end
 
