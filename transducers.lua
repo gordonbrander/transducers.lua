@@ -93,22 +93,6 @@ local function transduce(xform, step, seed, iter, state, at)
 end
 exports.transduce = transduce
 
-local function append(t, v)
-  table.insert(t, v)
-  return t
-end
-exports.append = append
-
--- Collect all values from an iterator into a table.
--- Returns collected values.
--- Example:
---
---     local clone = collect({1, 2, 3})
-local function collect(iter, state, at)
-  return reduce(append, {}, iter, state, at)
-end
-exports.collect = collect
-
 local function apply_to(v, f)
   return f(v)
 end
@@ -268,6 +252,33 @@ local function branch_and_merge(xform, predicate)
   end
 end
 exports.branch_and_merge = branch_and_merge
+
+local function append(t, v)
+  table.insert(t, v)
+  return t
+end
+exports.append = append
+
+-- Collect all values from an iterator into a table.
+-- Returns collected values.
+-- Example:
+--
+--     local clone = collect({1, 2, 3})
+local function collect(iter, state, at)
+  return reduce(append, {}, iter, state, at)
+end
+exports.collect = collect
+
+-- Eagerly transform iterator values using `xform` function. Transformation is
+-- done eagerly and transformed values are collected in a table.
+-- Returns collected values.
+-- Example:
+--
+--     eagerly(map(add_one), {1, 2, 3})
+local function eagerly(xform, iter, state, at)
+  return transduce(xform, append, {}, iter, state, at)
+end
+exports.eagerly = eagerly
 
 local function yield_indexed_reduction(i, v)
   local i = i + 1
