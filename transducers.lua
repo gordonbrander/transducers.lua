@@ -270,7 +270,9 @@ end
 exports.branch_and_merge = branch_and_merge
 
 local function yield_indexed_reduction(i, v)
-  coroutine.yield(i + 1, v)
+  local i = i + 1
+  coroutine.yield(i, v)
+  return i
 end
 
 -- Transform an iterator using a transformation function so that each value
