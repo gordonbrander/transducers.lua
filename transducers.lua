@@ -78,7 +78,7 @@ local function comp(...)
   return function(v)
     -- Loop through all functions and transform value with each function
     -- successively. Feed transformed value to next function in line.
-    return reduce(apply_to, v, fns)
+    return reduce(apply_to, v, ipairs(fns))
   end
 end
 exports.comp = comp
