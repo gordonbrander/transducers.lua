@@ -15,57 +15,26 @@ exports.reduced = reduced
 
 -- Reduce an iterator function into a value.
 -- `iter`, `state`, `at` are intended to be the return result of
--- an iterator factory like `ipairs()`. `state` and `at` are optional and
+-- an iterator factory function. `state` and `at` are optional and
 -- are provided for looping over stateless iterators. You may pass just the
 -- `iter` function if it is a stateful iterator.
 --
 -- Used by our more generic `reduce` function to handle iterator use cases.
-local function reduce_iterator(step, seed, iter, state, at)
+local function reduce(step, seed, iter, state, at)
   local result, msg = seed, nil
-  for i, v in iter, state, at do
-    -- We pass `step` the previous result and the value returned by iterator.
-    -- Note that we use an `i, v` return signiture. This matches the return
-    -- value of `ipairs` and `pairs`. However, if `v` is nil, we will pass
-    -- `i` as the value instead. This handles iterators that return a single
-    -- value per turn.
+  -- Note `reduce` will work for iterators that return a single value or a
+  -- pair of values... If a pair is returned, `b` is considered the value
+  -- to reduce. This is handy if you want to consume stateless iterators, like
+  -- those returned from `ipairs` or `pairs`.
+  for a, b in iter, state, at do
     -- Allow `step` to return a result and an optional message.
-    result, msg = step(result, v or i)
+    result, msg = step(result, b or a)
     -- If step returned a `msg`, then return early. This is useful for reporting
     -- errors during reduction or halting reduction early.
     if msg then return result, msg end
   end
   -- Return result along with "finished" message.
   return reduced(result)
-end
-
--- Define a generic reduce function for almost any type of value. You can
--- reduce: stateful and stateless iterators, tables, single values, even `nil`.
---
--- `reduce` takes a `step` function, a `seed` value and returns the new folded
--- result of our calculation.
---
--- Typical use:
--- 
---     local x = reduce(sum, 0, {1, 2, 3})
---
-local function reduce(step, seed, iter, state, at)
-  local type_of_iter = type(iter)
-  if type_of_iter == "function" then
-    -- If `iter` is a function, we treat it as an iterator function.
-    -- If it ain't an iterator, you'll probably get an error. Be smart.
-    return reduce_iterator(step, seed, iter, state, at)
-  elseif type_of_iter == "table" then
-    -- If `iter` is a table, we'll provide a convenience syntax that passes the
-    -- table through `ivalues` and then to `reduce_iterator`.
-    return reduce_iterator(step, seed, ipairs(iter))
-  elseif iter == nil then
-    -- Nil values get no step at all. Return seed as "reduced" value.
-    return reduced(seed)
-  else
-    -- Other non-iterator, non-table, non-nil values are treated as an iterator
-    -- yielding a single item -- themselves. We reduce them one step.
-    return reduced(step(seed, iter))
-  end
 end
 exports.reduce = reduce
 
