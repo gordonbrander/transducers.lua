@@ -19,7 +19,10 @@ exports.reduced = reduced
 -- are provided for looping over stateless iterators. You may pass just the
 -- `iter` function if it is a stateful iterator.
 --
--- Used by our more generic `reduce` function to handle iterator use cases.
+-- Example:
+--
+--     reduce(sum, 0, ipairs{1, 2, 3})
+--     > 9
 local function reduce(step, seed, iter, state, at)
   local result, msg = seed, nil
   -- Note `reduce` will work for iterators that return a single value or a
@@ -52,7 +55,7 @@ exports.reduce = reduce
 --
 -- Typical use:
 --
---     transduce(map(add_one), sum, 0, {1, 2, 3})
+--     transduce(map(add_one), sum, 0, ipairs{1, 2, 3})
 --     > 9
 local function transduce(xform, step, seed, iter, state, at)
   -- Transform stepping function with transforming function.
@@ -203,7 +206,7 @@ exports.take_while = take_while
 -- Example:
 --
 --     xf = branch_and_merge(map(add_one), is_number)
---     transduce(xf, step, 0, {1, "a", 2 "b", 3})
+--     transduce(xf, step, 0, ipairs{1, "a", 2 "b", 3})
 --
 local function branch_and_merge(xform, predicate)
   return function (step)
@@ -232,7 +235,7 @@ exports.append = append
 -- Returns collected values.
 -- Example:
 --
---     local clone = collect({1, 2, 3})
+--     local clone = collect(ipairs{1, 2, 3})
 local function collect(iter, state, at)
   return reduce(append, {}, iter, state, at)
 end
@@ -243,7 +246,7 @@ exports.collect = collect
 -- Returns collected values.
 -- Example:
 --
---     eagerly(map(add_one), {1, 2, 3})
+--     eagerly(map(add_one), ipairs{1, 2, 3})
 local function eagerly(xform, iter, state, at)
   return transduce(xform, append, {}, iter, state, at)
 end
@@ -261,7 +264,7 @@ end
 --
 -- Example:
 --
---     ups = lazily(map(string.upper), {"a", "b", "c"})
+--     ups = lazily(map(string.upper), ipairs{"a", "b", "c"})
 --     for i, x in ups do print(i, x) end
 --     > 1 "A"
 --     > 2 "B"
