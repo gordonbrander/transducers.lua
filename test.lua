@@ -4,6 +4,7 @@ local transduce = transducers.transduce
 local lazily = transducers.lazily
 local filter = transducers.filter
 local map = transducers.map
+local comp = transducers.comp
 local ipairs_rev = transducers.ipairs_rev
 
 local function suite(msg, callback)
@@ -63,5 +64,17 @@ suite("ipairs_rev() should iterate from RTL", function ()
   local iter, state, i = ipairs_rev(n)
 
   equal(iter(state, i), 3, "Started iteration from end of list")
+
+end)
+
+
+suite("comp() compose from RTL", function ()
+  local function greet(name)
+    return "Hello, " .. name .. "!"
+  end
+
+  local welcome = comp(greet, string.upper)
+
+  equal(welcome("bob"), "Hello, BOB!", "Composed RTL")
 
 end)
