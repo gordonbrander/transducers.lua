@@ -87,6 +87,9 @@ exports.ipairs_rev = ipairs_rev
 -- Compose multiple functions of one argument into a single function of one
 -- argument that will transform argument through each function, starting with
 -- the last in the list.
+-- `compose(b, a)` can be read as "b after a". Or to put it another way,
+-- `b(a(x))` is equivalent to `compose(b, a)(x)`.
+-- https://en.wikipedia.org/wiki/Function_composition_%28computer_science%29
 -- Returns the composed function.
 local function comp(...)
   -- Capture magic `arg` variable.
