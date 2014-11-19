@@ -4,6 +4,7 @@ local transduce = transducers.transduce
 local lazily = transducers.lazily
 local filter = transducers.filter
 local map = transducers.map
+local ipairs_rev = transducers.ipairs_rev
 
 local function suite(msg, callback)
   print(msg)
@@ -54,4 +55,13 @@ suite("lazily() should not yield filtered values", function ()
   equal(v, 3, "Filtered 2, kept 3")
   i, v = y()
   equal(v, nil, "Returns nil at end of iteration")
+end)
+
+suite("ipairs_rev() should iterate from RTL", function ()
+  local n = {1, 2, 3}
+
+  local iter, state, i = ipairs_rev(n)
+
+  equal(iter(state, i), 3, "Started iteration from end of list")
+
 end)

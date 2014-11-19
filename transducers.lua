@@ -69,8 +69,24 @@ local function apply_to(v, f)
   return f(v)
 end
 
+local function prev_ipair(t, i)
+  i = i - 1
+  if i < 1 then
+    return nil
+  else
+    return i, t[i]
+  end
+end
+
+-- Iterate over a table in reverse, starting with last element.
+local function ipairs_rev(t)
+  return prev_ipair, t, #t + 1
+end
+exports.ipairs_rev = ipairs_rev
+
 -- Compose multiple functions of one argument into a single function of one
--- argument that will transform argument through each function successively.
+-- argument that will transform argument through each function, starting with
+-- the last in the list.
 -- Returns the composed function.
 local function comp(...)
   -- Capture magic `arg` variable.
@@ -78,7 +94,7 @@ local function comp(...)
   return function(v)
     -- Loop through all functions and transform value with each function
     -- successively. Feed transformed value to next function in line.
-    return reduce(apply_to, v, ipairs(fns))
+    return reduce(apply_to, v, ipairs_reverse(fns))
   end
 end
 exports.comp = comp
