@@ -1,7 +1,8 @@
 -- Create a table to store our exported values.
 local exports = {}
 
-local transducers = require("transducers")
+local xf = require("transducers")
+local transduce = xf.transduce
 
 local function step_yield_input(_, v)
   -- Yield key, value pair. Note that this works with `filter` and `reject`
@@ -54,21 +55,21 @@ end
 --
 --     x = map(string.upper, ipairs{"a", "b", "c"})
 --     for v in x do print(v) end
-local map = xformer(transducers.map)
+local map = xformer(xf.map)
 exports.map = map
 
 -- Filter values in an iterator. Returns an iterator of values that pass test.
 --
 --     x = filter(is_letter_a, ipairs{"a", "b", "c"})
 --     for v in x do print(v) end
-local filter = xformer(transducers.filter)
+local filter = xformer(xf.filter)
 exports.filter = filter
 
 -- Reject values in an iterator. Returns an iterator of values that fail test.
 --
 --     x = reject(is_letter_a, ipairs{"a", "b", "c"})
 --     for v in x do print(v) end
-local reject = xformer(transducers.reject)
+local reject = xformer(xf.reject)
 exports.reject = reject
 
 -- Take values in an iterator until predicate fails. Returns an iterator of
@@ -76,7 +77,7 @@ exports.reject = reject
 --
 --     x = take_while(is_lowercase, ipairs{"a", "B", "C"})
 --     for v in x do print(v) end
-local take_while = xformer(transducers.take_while)
+local take_while = xformer(xf.take_while)
 exports.take_while = take_while
 
 -- Collapse adjacent values that are the same. Returns an iterator of values.
@@ -84,7 +85,7 @@ exports.take_while = take_while
 --     x = dedupe(ipairs{"a", "a", "b", "c"})
 --     for v in x do print(v) end
 local function dedupe(iter, state, at)
-  return transform(transducers.dedupe, iter, state, at)
+  return transform(xf.dedupe, iter, state, at)
 end
 exports.dedupe = dedupe
 
@@ -94,7 +95,7 @@ exports.dedupe = dedupe
 --     x = reductions(sum, 0, ipairs{1, 2, 3})
 --     for v in x do print(v) end
 local function reductions(step_reduction, seed, iter, state, at)
-  return transform(transducers.reductions(step_reduction, seed), iter, state, at)
+  return transform(xf.reductions(step_reduction, seed), iter, state, at)
 end
 exports.reductions = reductions
 
