@@ -150,19 +150,6 @@ local function reject(predicate)
 end
 exports.reject = reject
 
--- Check if something is `nil`. Returns boolean.
-local function is_something(thing)
-  return thing ~= nil
-end
-
--- Keep only values during reduction. All nil values will be ignored.
--- Note that `keep` is a transformation function. You can pass it a `step`
--- function and it will return a new `step` function that will only fold
--- over non-nil values.
--- Keep is an `xform` function. Use it on any `step` function.
-local keep = filter(is_something)
-exports.keep = keep
-
 -- Transform any reducing `step` function, returning a new `step` function that
 -- collapses adjacent duplicates.
 local function dedupe(step)
