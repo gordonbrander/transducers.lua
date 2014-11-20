@@ -260,13 +260,11 @@ local function collect(iter, state, at)
 end
 exports.collect = collect
 
-local function step_yield_indexed(i, v)
-  local i = i + 1
+local function step_yield_input(_, v)
   -- Yield key, value pair. Note that this works with `filter` and `reject`
   -- because it is within the scope of the step function. Filtering `xform` will
   -- make sure this step function is not called for values that are filtered out.
-  coroutine.yield(i, v)
-  return i
+  coroutine.yield(v)
 end
 
 -- Transform an iterator using a transformation function so that each value
@@ -276,13 +274,13 @@ end
 -- Example:
 --
 --     ups = lazily(map(string.upper), ipairs{"a", "b", "c"})
---     for i, v in ups do print(i, v) end
---     > 1 "A"
---     > 2 "B"
---     > 3 "C"
+--     for v in ups do print(i, v) end
+--     > "A"
+--     > "B"
+--     > "C"
 local function lazily(xform, iter, state, at)
   return coroutine.wrap(function ()
-    transduce(xform, step_yield_indexed, 0, iter, state, at)
+    transduce(xform, step_yield_input, nil, iter, state, at)
   end)
 end
 exports.lazily = lazily
