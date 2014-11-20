@@ -213,37 +213,6 @@ local function take_while(predicate)
 end
 exports.take_while = take_while
 
--- Given a transform function and a `predicate`, only use transformed steppper
--- for `input` that passes `predicate` test. All other inputs will be stepped
--- with the original step function. In contrast to `filter`, this means other
--- values will be untouched by `xform`, but will remain in reduction.
--- You can conceptualize this process as if we were branching the list,
--- transforming the contents of the branched list with `xform`, then merging
--- the result back into the original list.
--- Returns an xform function.
---
--- Example:
---
---     xf = branch_and_merge(map(add_one), is_number)
---     transduce(xf, step, 0, ipairs{1, "a", 2 "b", 3})
---
-local function branch_and_merge(xform, predicate)
-  return function (step)
-    -- Create transformed step function
-    local xformed_step = xform(step)
-    return function (result, input)
-      if predicate(input) then
-        -- If input passes test, then step with transformed stepper.
-        return xformed_step(result, input)
-      else
-        -- Otherwise step with original stepper.
-        return step(result, input)
-      end
-    end
-  end
-end
-exports.branch_and_merge = branch_and_merge
-
 local function append(t, v)
   table.insert(t, v)
   return t
