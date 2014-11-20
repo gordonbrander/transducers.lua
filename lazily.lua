@@ -97,3 +97,5 @@ local function reductions(step_reduction, seed, iter, state, at)
   return transform(transducers.reductions(step_reduction, seed), iter, state, at)
 end
 exports.reductions = reductions
+
+return exports
