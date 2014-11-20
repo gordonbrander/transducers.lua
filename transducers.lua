@@ -213,20 +213,4 @@ local function take_while(predicate)
 end
 exports.take_while = take_while
 
-local function append(t, v)
-  table.insert(t, v)
-  return t
-end
-exports.append = append
-
--- Collect all values from an iterator into a table.
--- Returns collected values.
--- Example:
---
---     local clone = collect(ipairs{1, 2, 3})
-local function collect(iter, state, at)
-  return reduce(append, {}, iter, state, at)
-end
-exports.collect = collect
-
 return exports
