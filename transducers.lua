@@ -68,6 +68,7 @@ exports.transduce = transduce
 local function apply_to(v, f)
   return f(v)
 end
+exports.apply_to = apply_to
 
 local function prev_ipair(t, i)
   i = i - 1
