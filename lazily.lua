@@ -16,17 +16,17 @@ end
 --
 -- Example:
 --
---     ups = lazily(map(string.upper), ipairs{"a", "b", "c"})
+--     ups = transform(map(string.upper), ipairs{"a", "b", "c"})
 --     for v in ups do print(i, v) end
 --     > "A"
 --     > "B"
 --     > "C"
-local function lazily(xform, iter, state, at)
+local function transform(xform, iter, state, at)
   return coroutine.wrap(function ()
     transduce(xform, step_yield_input, nil, iter, state, at)
   end)
 end
-exports.lazily = lazily
+exports.transform = transform
 
 local function append(t, v)
   table.insert(t, v)
@@ -44,9 +44,9 @@ local function collect(iter, state, at)
 end
 exports.collect = collect
 
-local function xformer(xform_factory, iter, state, at)
+local function xformer(xform_factory)
   return function(lambda, iter, state, at)
-    return lazily(xform_factory(xform_factory(lambda), iter, state, at)
+    return transform(xform_factory(lambda), iter, state, at)
   end
 end
 
@@ -84,7 +84,7 @@ exports.take_while = take_while
 --     x = dedupe(ipairs{"a", "a", "b", "c"})
 --     for v in x do print(v) end
 local function dedupe(iter, state, at)
-  return lazily(transducers.dedupe, iter, state, at)
+  return transform(transducers.dedupe, iter, state, at)
 end
 exports.dedupe = dedupe
 
@@ -94,6 +94,6 @@ exports.dedupe = dedupe
 --     x = reductions(sum, 0, ipairs{1, 2, 3})
 --     for v in x do print(v) end
 local function reductions(step_reduction, seed, iter, state, at)
-  return lazily(transducers.reductions(step_reduction, seed), iter, state, at)
+  return transform(transducers.reductions(step_reduction, seed), iter, state, at)
 end
 exports.reductions = reductions
