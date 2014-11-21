@@ -3,6 +3,7 @@ local exports = {}
 
 local xf = require("transducers")
 local transduce = xf.transduce
+local reduce = xf.reduce
 
 local function step_yield_input(_, v)
   -- Yield key, value pair. Note that this works with `filter` and `reject`
