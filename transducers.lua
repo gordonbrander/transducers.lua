@@ -93,8 +93,8 @@ exports.ipairs_rev = ipairs_rev
 -- https://en.wikipedia.org/wiki/Function_composition_%28computer_science%29
 -- Returns the composed function.
 local function comp(...)
-  -- Capture magic `arg` variable.
-  local fns = arg
+  -- Capture magic `...` variable.
+  local fns = {...}
   return function(v)
     -- Loop through all functions and transform value with each function
     -- successively. Feed transformed value to next function in line.
