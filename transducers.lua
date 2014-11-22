@@ -9,7 +9,7 @@ local exports = {}
 -- as a unique message identity. Used by `reduce_iterator` to allow for
 -- early termination of reduction.
 local function reduced(v)
-  return v, "Finished reduction"
+  return v, reduced
 end
 exports.reduced = reduced
 
@@ -34,10 +34,10 @@ local function reduce(step, seed, iter, state, at)
     result, msg = step(result, b or a)
     -- If step returned a `msg`, then return early. This is useful for reporting
     -- errors during reduction or halting reduction early.
-    if msg then return result, msg end
+    if msg == reduced then return result end
   end
   -- Return result along with "finished" message.
-  return reduced(result)
+  return result
 end
 exports.reduce = reduce
 
