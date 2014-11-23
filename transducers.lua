@@ -92,13 +92,19 @@ exports.ipairs_rev = ipairs_rev
 -- `b(a(x))` is equivalent to `compose(b, a)(x)`.
 -- https://en.wikipedia.org/wiki/Function_composition_%28computer_science%29
 -- Returns the composed function.
-local function comp(...)
-  -- Capture magic `...` variable.
-  local fns = {...}
-  return function(v)
-    -- Loop through all functions and transform value with each function
-    -- successively. Feed transformed value to next function in line.
-    return reduce(apply_to, v, ipairs_rev(fns))
+local function comp(a, b, ...)
+  if not ... then
+    -- Slightly faster path for simply wrapping 2 functions. Doesn't need to
+    -- create table.
+    return function (v)
+      return a(b(v))
+    end
+  else
+    return function(v)
+      -- Loop through all functions and transform value with each function
+      -- successively. Feed transformed value to next function in line.
+      return reduce(apply_to, v, ipairs_rev({...}))
+    end
   end
 end
 exports.comp = comp
