@@ -103,7 +103,7 @@ local function comp(a, b, ...)
     return function(v)
       -- Loop through all functions and transform value with each function
       -- successively. Feed transformed value to next function in line.
-      return reduce(apply_to, v, ipairs_rev({...}))
+      return reduce(apply_to, v, ipairs_rev({a, b, ...}))
     end
   end
 end
