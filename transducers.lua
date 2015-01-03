@@ -140,6 +140,17 @@ local function map(a2b)
 end
 exports.map = map
 
+-- Given inputs that are tables, `cat` will step through all values in tables
+-- and append to reduction.
+-- More concretely: imagine you have an iterator of tables. `cat` conceptually
+-- "flattens" the tables, reducing over each of the values of each of the tables.
+local function cat(step)
+  return function(result, input)
+    return reduce(step, result, ipairs(input))
+  end
+end
+exports.cat = cat
+
 -- Define `filter` in terms of a fold `step` transformation.
 -- Throws out any value that does not pass `predicate` test function.
 -- Returns `xform` function.
