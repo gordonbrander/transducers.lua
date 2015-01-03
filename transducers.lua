@@ -93,24 +93,16 @@ exports.ipairs_rev = ipairs_rev
 -- argument that will transform argument through each function, starting with
 -- the last in the list.
 --
--- `compose(b, a)` can be read as "b after a". Or to put it another way,
--- `b(a(x))` is equivalent to `compose(b, a)(x)`.
+-- `compose(z, y)` can be read as "z after y". Or to put it another way,
+-- `z(y(x))` is equivalent to `compose(z, y)(x)`.
 -- https://en.wikipedia.org/wiki/Function_composition_%28computer_science%29
 -- Returns the composed function.
-local function comp(a, b, ...)
-  if not ... then
-    -- Slightly faster path for simply wrapping 2 functions. Doesn't need to
-    -- create table.
-    return function (v)
-      return a(b(v))
-    end
-  else
-    local fns = {a, b, ...}
-    return function(v)
-      -- Loop through all functions and transform value with each function
-      -- successively. Feed transformed value to next function in line.
-      return reduce(apply_to, v, ipairs_rev(fns))
-    end
+local function comp(z, y, ...)
+  local fns = {z, y, ...}
+  return function(v)
+    -- Loop through all functions and transform value with each function
+    -- successively. Feed transformed value to next function in line.
+    return reduce(apply_to, v, ipairs_rev(fns))
   end
 end
 exports.comp = comp
