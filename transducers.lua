@@ -69,6 +69,28 @@ local function transduce(xform, step, seed, iter, ...)
 end
 exports.transduce = transduce
 
+-- Insert value into table, mutating table.
+-- Returns table.
+local function append(t, v)
+  table.insert(t, v)
+  return t
+end
+exports.append = append
+
+-- Transform an iterator through an `xform` function, appending results to
+-- `into_table`. Mutates `into_table`.
+--
+--     into({}, map(is_even), ipairs {1, 2, 3})
+--
+-- If you're familiar with Clojure's `into`, you'll note that this is a bit of
+-- a twist on the original. In Clojure sequences implement a sequence interface.
+-- In Lua we use iterator factories to return a consistant iterator interface.
+-- Hence, `into` takes an iterator function and optional state variables.
+local function into(into_table, xform, iter, ...)
+  return transduce(xform, append, into_table, iter, ...)
+end
+exports.into = into
+
 local function apply_to(v, f)
   return f(v)
 end
