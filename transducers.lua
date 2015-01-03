@@ -189,6 +189,24 @@ local function reductions(step_reduction, reduction)
 end
 exports.reductions = reductions
 
+-- Take first `n` values, then stop reduction.
+-- Returns `xform` function.
+local function take(n)
+  return function(step)
+    return function (result, input)
+      if n > 0 then
+        n = n - 1
+        -- Keep taking values until a value fails `predicate` test function.
+        return step(result, input)
+      else
+        -- When predicate fails, end reduction by sending `reduced` message.
+        return reduced(result)
+      end
+    end
+  end
+end
+exports.take = take
+
 -- Take values until `predicate` returns false. Then stop reduction.
 -- Returns `xform` function.
 local function take_while(predicate)
