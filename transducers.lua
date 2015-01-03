@@ -6,30 +6,33 @@
 local exports = {}
 
 -- Given a value, returns value plus "reduced" function which is used 
--- as a unique message identity. Used by `reduce_iterator` to allow for
--- early termination of reduction.
+-- as a unique message identity. Used as a message passing mechanism for
+-- `reduce()` to allow for early termination of reduction.
+--
+-- @TODO may want to switch to boxing reduced values in a table so I can add
+-- something like preservingReduced which will be compatible with non-savvy
+-- reduce functions.
 local function reduced(v)
   return v, reduced
 end
 exports.reduced = reduced
 
 -- Reduce an iterator function into a value.
--- `iter`, `state`, `at` are intended to be the return result of
--- an iterator factory function. `state` and `at` are optional and
--- are provided for looping over stateless iterators. You may pass just the
--- `iter` function if it is a stateful iterator.
+-- `step` is the reducing function.
+-- `seed` is the seed value for reduction.
+-- `iter` is an iterator function. `...` allows for the additional state
+-- variables that are returned from stateless iterator factories like `ipairs`.
 --
 -- Example:
 --
 --     reduce(sum, 0, ipairs{1, 2, 3})
---     > 9
-local function reduce(step, seed, iter, state, at)
+local function reduce(step, seed, iter, ...)
   local result, msg = seed, nil
   -- Note `reduce` will work for iterators that return a single value or a
   -- pair of values... If a pair is returned, `b` is considered the value
-  -- to reduce. This is handy if you want to consume stateless iterators, like
+  -- to reduce. This is handy if you want to consume standard iterators, like
   -- those returned from `ipairs` or `pairs`.
-  for a, b in iter, state, at do
+  for a, b in iter, ... do
     -- Allow `step` to return a result and an optional message.
     result, msg = step(result, b or a)
     -- If step returned a `msg`, then return early. This is useful for reporting
@@ -55,13 +58,14 @@ exports.reduce = reduce
 --
 -- Typical use:
 --
---     transduce(map(add_one), sum, 0, ipairs{1, 2, 3})
+--     xform = map(inc)
+--     transduce(xform, sum, 0, ipairs{1, 2, 3})
 --     > 9
-local function transduce(xform, step, seed, iter, state, at)
+local function transduce(xform, step, seed, iter, ...)
   -- Transform stepping function with transforming function.
   -- Then fold over `thing` using transformed `step` function and `result`
   -- seed value.
-  return reduce(xform(step), seed, iter, state, at)
+  return reduce(xform(step), seed, iter, ...)
 end
 exports.transduce = transduce
 
@@ -88,6 +92,7 @@ exports.ipairs_rev = ipairs_rev
 -- Compose multiple functions of one argument into a single function of one
 -- argument that will transform argument through each function, starting with
 -- the last in the list.
+--
 -- `compose(b, a)` can be read as "b after a". Or to put it another way,
 -- `b(a(x))` is equivalent to `compose(b, a)(x)`.
 -- https://en.wikipedia.org/wiki/Function_composition_%28computer_science%29
@@ -141,6 +146,7 @@ exports.filter = filter
 
 -- Reject values that do not pass `predicate` test function.
 -- Returns `xform` function.
+-- @TODO may want to rename this to `remove` for parity with Clojure.
 local function reject(predicate)
   return function(step)
     return function(result, input)
