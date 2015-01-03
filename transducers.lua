@@ -151,6 +151,22 @@ local function cat(step)
 end
 exports.cat = cat
 
+--[[
+@TODO A puzzle. Mapcat is in wrong compositional order, because composing
+xform functions should apply them in reverse order. This does not seem to
+happen with my implementation which is a puzzle considering that my
+implementation is very similar to the Clojure implementation.
+
+-- a lot of indirection in the transducers JS implementation, but I think xf
+-- functions consume xf functions and return xf functions, rather than consuming
+-- step and returning step.
+-- Map the values in an iterator of tables.
+local function mapcat(a2b)
+  return comp(map(a2b), cat)
+end
+exports.mapcat = mapcat
+]]--
+
 -- Define `filter` in terms of a fold `step` transformation.
 -- Throws out any value that does not pass `predicate` test function.
 -- Returns `xform` function.
@@ -256,5 +272,20 @@ local function take_while(predicate)
   end
 end
 exports.take_while = take_while
+
+--[[
+@TODO take_nth
+https://clojure.github.io/clojure/branch-master/clojure.core-api.html#clojure.core/take-nth
+
+@TODO drop
+https://clojure.github.io/clojure/branch-master/clojure.core-api.html#clojure.core/drop
+
+@TODO drop-last
+https://clojure.github.io/clojure/branch-master/clojure.core-api.html#clojure.core/drop-last
+
+@TODO drop-while
+https://clojure.github.io/clojure/branch-master/clojure.core-api.html#clojure.core/drop-while
+
+]]--
 
 return exports
