@@ -2,6 +2,7 @@ local transducers = require("transducers")
 local reduce = transducers.reduce
 local transduce = transducers.transduce
 local filter = transducers.filter
+local reject = transducers.reject
 local map = transducers.map
 local into = transducers.into
 local comp = transducers.comp
@@ -62,7 +63,12 @@ end)
 test("filter()", function()
   local x = {1, 2}
   local y = transduce(filter(is_odd), sum, 0, ipairs(x))
-  ok(y == 1, "Filter removes items that don't pass the test")
+  ok(y == 1, "filter removes items that don't pass the test")
 end)
 
+test("reject()", function()
+  local x = {1, 2}
+  local y = transduce(reject(is_odd), sum, 0, ipairs(x))
+  ok(y == 2, "reject removes items that pass the test")
+end)
 
