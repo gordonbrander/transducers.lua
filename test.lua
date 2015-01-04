@@ -56,11 +56,13 @@ end)
 test("map()", function()
   local x = {1, 2}
   local y = transduce(map(inc), sum, 0, ipairs(x))
-  ok(y == 5, "map changes all items in iterator")
+  ok(y == 5, "map all items in iterator")
 end)
 
 test("filter()", function()
   local x = {1, 2}
-  local y = transduce(map(inc), sum, 0, ipairs(x))
-  ok(y == 5, "map changes all items in iterator")
+  local y = transduce(filter(is_odd), sum, 0, ipairs(x))
+  ok(y == 1, "Filter removes items that don't pass the test")
 end)
+
+
