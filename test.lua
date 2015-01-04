@@ -3,6 +3,7 @@ local reduce = transducers.reduce
 local transduce = transducers.transduce
 local filter = transducers.filter
 local map = transducers.map
+local into = transducers.into
 local comp = transducers.comp
 
 local microtest = require("microtest")
@@ -40,7 +41,25 @@ test("comp()", function()
   ok(x("") == "ab", "comp executes from right to left")
 end)
 
+test("transduce(xf, step, seed, iter)", function()
+  local x = {1, 2}
+  local y = transduce(map(inc), sum, 0, ipairs(x))
+  ok(y == 5, "Transduce transforms items in interator")
+end)
+
+test("into(t, xf, iter)", function()
+  local x = {1, 2}
+  local y = into({}, map(inc), ipairs(x))
+  ok(y[1] == 2 and y[2] == 3, "into collects transformed values into table")
+end)
+
 test("map()", function()
+  local x = {1, 2}
+  local y = transduce(map(inc), sum, 0, ipairs(x))
+  ok(y == 5, "map changes all items in iterator")
+end)
+
+test("filter()", function()
   local x = {1, 2}
   local y = transduce(map(inc), sum, 0, ipairs(x))
   ok(y == 5, "map changes all items in iterator")
