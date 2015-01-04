@@ -28,6 +28,13 @@ function cat_b(s)
   return s .. "b"
 end
 
+test("reduce()", function()
+  local x = reduce(sum, 0, ipairs{1, 2, 3})
+  ok(x == 6, "Reduce steps through values in an iterator, reducing a value")
+
+  -- @TODO test for early end of reduction.
+end)
+
 test("comp()", function()
   local x = comp(cat_b, cat_a)
   ok(x("") == "ab", "comp executes from right to left")
