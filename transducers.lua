@@ -91,6 +91,11 @@ local function into(into_table, xform, iter, ...)
 end
 exports.into = into
 
+local function id(thing)
+  return thing
+end
+exports.id = id
+
 -- Compose 2 functions.
 local function comp2(z, y)
   return function(x) return z(y(x)) end
@@ -105,7 +110,7 @@ end
 -- https://en.wikipedia.org/wiki/Function_composition_%28computer_science%29
 -- Returns the composed function.
 local function comp(z, y, ...)
-  return reduce(comp2, z, ipairs{y, ...})
+  return reduce(comp2, z or id, ipairs{y, ...})
 end
 exports.comp = comp
 
