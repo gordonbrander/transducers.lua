@@ -93,7 +93,7 @@ exports.into = into
 
 -- Compose 2 functions.
 local function comp2(z, y)
-  return function(x) z(y(x)) end
+  return function(x) return z(y(x)) end
 end
 
 -- Compose multiple functions of one argument into a single function of one
