@@ -111,6 +111,11 @@ local function ipairs_rev(t)
 end
 exports.ipairs_rev = ipairs_rev
 
+-- Compose 2 functions.
+local function comp2(z, y)
+  return function(x) z(y(x)) end
+end
+
 -- Compose multiple functions of one argument into a single function of one
 -- argument that will transform argument through each function, starting with
 -- the last in the list.
@@ -120,12 +125,7 @@ exports.ipairs_rev = ipairs_rev
 -- https://en.wikipedia.org/wiki/Function_composition_%28computer_science%29
 -- Returns the composed function.
 local function comp(z, y, ...)
-  local fns = {z, y, ...}
-  return function(v)
-    -- Loop through all functions and transform value with each function
-    -- successively. Feed transformed value to next function in line.
-    return reduce(apply_to, v, ipairs_rev(fns))
-  end
+  return reduce(comp2, z, ipairs{y, ...})
 end
 exports.comp = comp
 
