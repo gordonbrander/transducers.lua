@@ -91,26 +91,6 @@ local function into(into_table, xform, iter, ...)
 end
 exports.into = into
 
-local function apply_to(v, f)
-  return f(v)
-end
-exports.apply_to = apply_to
-
-local function prev_ipair(t, i)
-  i = i - 1
-  if i < 1 then
-    return nil
-  else
-    return i, t[i]
-  end
-end
-
--- Iterate over a table in reverse, starting with last element.
-local function ipairs_rev(t)
-  return prev_ipair, t, #t + 1
-end
-exports.ipairs_rev = ipairs_rev
-
 -- Compose 2 functions.
 local function comp2(z, y)
   return function(x) z(y(x)) end
