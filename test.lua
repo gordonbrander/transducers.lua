@@ -5,6 +5,7 @@ local filter = transducers.filter
 local reject = transducers.reject
 local map = transducers.map
 local into = transducers.into
+local take = transducers.take
 local comp = transducers.comp
 
 local microtest = require("microtest")
@@ -72,3 +73,8 @@ test("reject()", function()
   ok(y == 2, "reject removes items that pass the test")
 end)
 
+test("test()", function()
+  local x = {1, 2}
+  local y = transduce(take(1), sum, 0, ipairs(x))
+  ok(y == 1, "Take stops reduction after taking n items")
+end)
