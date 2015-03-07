@@ -92,13 +92,6 @@ local function into(xform, iter, ...)
 end
 exports.into = into
 
--- Collect all values of an iterator into a list table using `reduce`.
--- Returns a list table.
-local function collect(iter, ...)
-  return reduce(append, {}, iter, ...)
-end
-exports.collect = collect
-
 local function id(thing)
   return thing
 end
