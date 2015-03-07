@@ -51,7 +51,7 @@ end)
 
 test("into(t, xf, iter)", function()
   local x = {1, 2}
-  local y = into({}, map(inc), ipairs(x))
+  local y = into(map(inc), ipairs(x))
   ok(y[1] == 2 and y[2] == 3, "into collects transformed values into table")
 end)
 
