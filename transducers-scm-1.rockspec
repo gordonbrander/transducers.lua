@@ -1,7 +1,7 @@
 package = "Transducers"
 version = "scm-1"
 source = {
-  url = "git://github.com/gordonbrander/transducers"
+  url = "git://github.com/gordonbrander/transducers.lua"
 }
 description = {
   summary = "Composable list transformations inspired by Clojure transducers",
@@ -10,7 +10,7 @@ A re-interpretation of Clojure's Transducers for Lua.
 Transducers are composable algorithmic transformations.
 Learn more about Transducers here: http://clojure.org/transducers.
   ]],
-  homepage = "https://github.com/gordonbrander/transducers",
+  homepage = "https://github.com/gordonbrander/transducers.lua",
   license = "MIT/X11"
 }
 dependencies = {
