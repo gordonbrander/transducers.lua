@@ -1,7 +1,8 @@
 package = "Transducers"
 version = "0.0-1"
 source = {
-  url = "git://github.com/gordonbrander/transducers.lua"
+  url = "git://github.com/gordonbrander/transducers.lua",
+  tag = "0.0-1"
 }
 description = {
   summary = "Composable list transformations inspired by Clojure transducers",
